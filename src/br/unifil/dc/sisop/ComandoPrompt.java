@@ -15,18 +15,22 @@ public class ComandoPrompt {
     
     public ComandoPrompt(String comando) {
         argumentos = new ArrayList<String>();
-        nome = comando.substring(0, comando.indexOf(' '));
-        String curr = comando.substring(comando.indexOf(' ') + 1);
-        int i = 0;
-        while (!curr.isEmpty()){
-            if (curr.indexOf(' ') > -1) {
-                argumentos.add(i, curr.substring(0, curr.indexOf(' ')));
-                curr = curr.substring(curr.indexOf(' ') + 1);
-                i++;
-            } else {
-                argumentos.add(i, curr);
-                curr = "";
+        if(comando.indexOf(' ') > -1){
+            nome = comando.substring(0, comando.indexOf(' '));
+            String curr = comando.substring(comando.indexOf(' ') + 1);
+            int i = 0;
+            while (!curr.isEmpty()){
+                if (curr.indexOf(' ') > -1) {
+                    argumentos.add(i, curr.substring(0, curr.indexOf(' ')));
+                    curr = curr.substring(curr.indexOf(' ') + 1);
+                    i++;
+                } else {
+                    argumentos.add(i, curr);
+                    curr = "";
+                }
             }
+        } else {
+            nome = comando;
         }
     }
     

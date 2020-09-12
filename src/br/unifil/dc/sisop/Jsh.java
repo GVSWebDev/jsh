@@ -1,7 +1,11 @@
 package br.unifil.dc.sisop;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 /**
@@ -12,15 +16,17 @@ import java.util.Scanner;
  */
 public final class Jsh {
 
+
+
     /**
     * Funcao principal do Jsh.
     */
     public static void promptTerminal() throws Exception {
-
+        String currDir = System.getProperty("user.dir");
         while (true) {
-    		exibirPrompt();
+    		exibirPrompt(currDir);
     		ComandoPrompt comandoEntrado = lerComando();
-    		//executarComando(comandoEntrado);
+    		currDir = executarComando(comandoEntrado, currDir);
     	}
     }
 
@@ -28,13 +34,13 @@ public final class Jsh {
     * Escreve o prompt na saida padrao para o usuário reconhecê-lo e saber que o
     * terminal está pronto para receber o próximo comando como entrada.
     */
-    public static void exibirPrompt() throws Exception{
+    public static void exibirPrompt(String currDir) throws Exception{
         String u = System.getProperty("user.name");
 
         //Process p = Runtime.getRuntime().exec("id");
         //BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
         //String UID = stdInput.readLine();
-        System.out.println(u+"#"+":"+System.getProperty("user.dir") + "%");
+        System.out.print("\n"+u+"#"+":"+ currDir + "% ");
 
     }
 
@@ -66,8 +72,64 @@ public final class Jsh {
     * Se nao for nenhuma das situacoes anteriores, exibe uma mensagem de comando ou
     * programa desconhecido.
     */
-    public static void executarComando(ComandoPrompt comando) {
-        throw new RuntimeException("Método ainda não implementado.");
+    public static String executarComando(ComandoPrompt comando, String currDir) {
+        switch(verificarComando(comando.getNome())){
+            case -1:
+                System.out.println("Comando ou Programa Desconhecido!");
+                return currDir;
+            case 0:
+                System.exit(0);
+                break;
+            case 1:
+                System.out.println("Sao "+ ComandosInternos.exibirRelogio());
+                break;
+            case 2:
+                System.out.println(ComandosInternos.escreverListaArquivos(currDir));
+                break;
+            case 3:
+                try{
+                    ComandosInternos.criarNovoDiretorio(comando.getArgumentos().get(0), currDir);
+                } catch (IndexOutOfBoundsException e){
+                    System.out.println("Ta faltando argumento pohac");
+                } catch (Exception e){
+                    System.out.println(e);
+                }
+                break;
+            case 4:
+                try{
+                    ComandosInternos.apagarDiretorio(comando.getArgumentos().get(0), currDir);
+                } catch (IndexOutOfBoundsException e){
+                    System.out.println("Ta faltando argumento pohac");
+                } catch (Exception e){
+                    System.out.println(e);
+                }
+                break;
+            case 5:
+                try{
+                    currDir = ComandosInternos.mudarDiretorioTrabalho(comando.getArgumentos().get(0), currDir);
+                } catch (IndexOutOfBoundsException e){
+                    System.out.println("Ta faltando argumento pohac");
+                } catch (Exception e){
+                    System.out.println(e);
+                }
+                break;
+        }
+        return currDir;
+    }
+
+    /**
+     * Verifica se o comando existe
+     * @param c comando a ser virifcado
+     * @return retorna o indice do comando caso encontrado, caso contrario, retorna -1, indicando que o comando não existe;
+     */
+    public static int verificarComando(String c){
+        List<String> listaComandos = Arrays.asList("encerrar", "relogio", "la", "cd", "ad", "mdt");
+        for(int i = 0; i < listaComandos.size(); i++){
+            if(c.equals(listaComandos.get(i))){
+                return i;
+            }
+        }
+        return -1;
     }
 
     public static int executarPrograma(ComandoPrompt comando) {
