@@ -1,5 +1,6 @@
 package br.unifil.dc.sisop;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,8 +14,20 @@ import java.util.Collections;
 public class ComandoPrompt {
     
     public ComandoPrompt(String comando) {
-        // ESCREVA AQUI SEU CODIGO PARA ESTRUTURAR O COMANDO RECEBIDO DO PROMPT.
-        throw new RuntimeException("Método ainda não implementado");
+        argumentos = new ArrayList<String>();
+        nome = comando.substring(0, comando.indexOf(' '));
+        String curr = comando.substring(comando.indexOf(' ') + 1);
+        int i = 0;
+        while (!curr.isEmpty()){
+            if (curr.indexOf(' ') > -1) {
+                argumentos.add(i, curr.substring(0, curr.indexOf(' ')));
+                curr = curr.substring(curr.indexOf(' ') + 1);
+                i++;
+            } else {
+                argumentos.add(i, curr);
+                curr = "";
+            }
+        }
     }
     
     /**
@@ -34,9 +47,9 @@ public class ComandoPrompt {
      */
     public List<String> getArgumentos() {
 
-        return Collections.unmodifiableList(Arrays.asList(argumentos));
+        return Collections.unmodifiableList(argumentos);
     }
     
     private final String nome;
-    private final String[] argumentos;
+    private final ArrayList<String> argumentos;
 }

@@ -1,5 +1,9 @@
 package br.unifil.dc.sisop;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Scanner;
+
 /**
  * Write a description of class Jsh here.
  *
@@ -7,16 +11,16 @@ package br.unifil.dc.sisop;
  * @version 180823
  */
 public final class Jsh {
-    
+
     /**
     * Funcao principal do Jsh.
     */
-    public static void promptTerminal() {
+    public static void promptTerminal() throws Exception {
 
         while (true) {
     		exibirPrompt();
     		ComandoPrompt comandoEntrado = lerComando();
-    		executarComando(comandoEntrado);
+    		//executarComando(comandoEntrado);
     	}
     }
 
@@ -24,9 +28,14 @@ public final class Jsh {
     * Escreve o prompt na saida padrao para o usuário reconhecê-lo e saber que o
     * terminal está pronto para receber o próximo comando como entrada.
     */
-    public static void exibirPrompt() {
+    public static void exibirPrompt() throws Exception{
+        String u = System.getProperty("user.name");
 
-        throw new RuntimeException("Método ainda não implementado.");
+        //Process p = Runtime.getRuntime().exec("id");
+        //BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        //String UID = stdInput.readLine();
+        System.out.println(u+"#"+":"+System.getProperty("user.dir") + "%");
+
     }
 
     /**
@@ -40,8 +49,10 @@ public final class Jsh {
     * @return 
     */
     public static ComandoPrompt lerComando() {
-
-        throw new RuntimeException("Método ainda não implementado.");
+        Scanner input = new Scanner(System.in);
+        String i = input.nextLine();
+        ComandoPrompt c = new ComandoPrompt(i);
+        return c;
     }
 
     /**
@@ -67,7 +78,7 @@ public final class Jsh {
     /**
      * Entrada do programa. Provavelmente você não precisará modificar esse método.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
 
         promptTerminal();
     }
