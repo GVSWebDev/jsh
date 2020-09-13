@@ -1,8 +1,6 @@
 package br.unifil.dc.sisop;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -34,13 +32,19 @@ public final class Jsh {
     * Escreve o prompt na saida padrao para o usuário reconhecê-lo e saber que o
     * terminal está pronto para receber o próximo comando como entrada.
     */
-    public static void exibirPrompt(String currDir) throws Exception{
+    public static void exibirPrompt(String currDir){
         String u = System.getProperty("user.name");
+        String UID = "";
+        try {
+            Process p = Runtime.getRuntime().exec("id");
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            UID = stdInput.readLine();
+        } catch (Exception e){
+            //o usuario não está usando linux, então UID não existe (eu acho), que pena!
+        } finally {
+            System.out.print("\n"+u+"#"+UID+":"+ currDir + "% ");
+        }
 
-        //Process p = Runtime.getRuntime().exec("id");
-        //BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        //String UID = stdInput.readLine();
-        System.out.print("\n"+u+"#"+":"+ currDir + "% ");
 
     }
 
@@ -75,7 +79,7 @@ public final class Jsh {
     public static String executarComando(ComandoPrompt comando, String currDir) {
         switch(verificarComando(comando.getNome())){
             case -1:
-                System.out.println("Comando ou Programa Desconhecido!");
+                executarPrograma(comando, currDir);
                 return currDir;
             case 0:
                 System.exit(0);
@@ -90,7 +94,7 @@ public final class Jsh {
                 try{
                     ComandosInternos.criarNovoDiretorio(comando.getArgumentos().get(0), currDir);
                 } catch (IndexOutOfBoundsException e){
-                    System.out.println("Ta faltando argumento pohac");
+                    System.out.println("Esta faltando argumentos! RTFM");
                 } catch (Exception e){
                     System.out.println(e);
                 }
@@ -99,7 +103,7 @@ public final class Jsh {
                 try{
                     ComandosInternos.apagarDiretorio(comando.getArgumentos().get(0), currDir);
                 } catch (IndexOutOfBoundsException e){
-                    System.out.println("Ta faltando argumento pohac");
+                    System.out.println("Esta faltando argumentos! RTFM");
                 } catch (Exception e){
                     System.out.println(e);
                 }
@@ -108,7 +112,7 @@ public final class Jsh {
                 try{
                     currDir = ComandosInternos.mudarDiretorioTrabalho(comando.getArgumentos().get(0), currDir);
                 } catch (IndexOutOfBoundsException e){
-                    System.out.println("Ta faltando argumento pohac");
+                    System.out.println("Esta faltando argumentos! RTFM");
                 } catch (Exception e){
                     System.out.println(e);
                 }
@@ -132,8 +136,44 @@ public final class Jsh {
         return -1;
     }
 
-    public static int executarPrograma(ComandoPrompt comando) {
-        throw new RuntimeException("Método ainda não implementado.");
+    public static void executarPrograma(ComandoPrompt comando, String currDir) {
+        File f = new File(currDir);
+        String[] arrF = f.list();
+        boolean found = false;
+
+        for(String a : arrF){
+            if(a.equals(comando.getNome())){
+                found = true;
+                File f2 = new File (currDir+"\\"+comando.getNome());
+                if(f2.canExecute()){
+                    try {
+                        Process p = new ProcessBuilder(comando.getNome()).start();
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                        String s;
+                        while ((s = reader.readLine()) != null) {
+                            System.out.println(s);
+                        }
+
+                        int exitCode = p.waitFor();
+                        if(exitCode > 0){
+                            System.out.print("Erro na execucao do processo filho! ");
+                        }
+                        System.out.println("Processo filho encerrado com exit code " + exitCode);
+                    } catch (IOException e){
+                        e.getMessage();
+                    } catch (InterruptedException e){
+                        e.getMessage();
+                    }
+                } else {
+                    System.out.println("Nao foi possivel fazer a execucao do programa "+ comando.getNome()+"!");
+                }
+            }
+        }
+        if (!found){
+            System.out.println("Comando ou programa \""+comando.getNome()+"\" inexistente.");
+        }
+
+
     }
     
     

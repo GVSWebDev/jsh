@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="jsh:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/jsh_jar</output-path>
+    <root id="archive" name="jsh.jar">
+      <element id="module-output" name="jsh" />
+    </root>
+  </artifact>
+</component>
