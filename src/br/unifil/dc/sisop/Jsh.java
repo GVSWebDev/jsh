@@ -36,11 +36,11 @@ public final class Jsh {
         String u = System.getProperty("user.name");
         String UID = "";
         try {
-            Process p = Runtime.getRuntime().exec("id");
+            Process p = Runtime.getRuntime().exec("id -u " + u);
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
             UID = stdInput.readLine();
         } catch (Exception e){
-            //o usuario não está usando linux, então UID não existe (eu acho), que pena!
+            System.out.println("Erro ao determinar UID: " + e.getMessage());
         } finally {
             System.out.print("\n"+u+"#"+UID+":"+ currDir + "% ");
         }
